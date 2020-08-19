@@ -4,18 +4,21 @@ defmodule Yahtzee do
   """
 
   @doc """
-  Hello world.
+  Scoring dice rolls per category of roll (i.e. yahtzee, chance)
 
   ## Examples
 
-      iex> Yahtzee.hello()
-      :world
-
+      iex> Yahtzee.score(:chance, [1,2,3,4,5])
+      15
+      iex> Yahtzee.score(:yahtzee, [2,2,2,2,2])
+      50
+      iex> Yahtzee.score(:sixes, [1,6,2,6,3])
+      12
+      iex> Yahtzee.score(:fives, [1,5,2,5,3])
+      10
+      iex> Yahtzee.score(:full_house, [2,2,2,5,5])
+      16
   """
-  def hello do
-    :world
-  end
-
   def score(:chance, dice) do
     Enum.sum(dice)
   end
@@ -28,7 +31,7 @@ defmodule Yahtzee do
     if len == 1 do 50 else 0 end
   end
 
-  def score(:sixs, dice) do
+  def score(:sixes, dice) do
     dice
     |> Enum.reject(fn x -> x !== 6 end)
     |> Enum.sum()
@@ -64,29 +67,37 @@ defmodule Yahtzee do
     |> Enum.sum()
   end
 
-  # def score(:pair, dice) do
-  #   result = dice
-  #   |> Enum.group_by(&(&1))
-  #   |> Enum.filter(fn {_, list} -> length(list) == 1 end)
+  def score(:pair, dice) do
+    result = dice
+    |> Enum.group_by(&(&1))
+    |> Enum.filter(fn {_, list} -> length(list) == 2 end)
 
-  #   sum_pair(result)
-  # end
+    if length(result) == 1 do sum_pair(result) else 0 end
+  end
 
   def score(:two_pair, dice) do
     result = dice
     |> Enum.group_by(&(&1))
     |> Enum.filter(fn {_, list} -> length(list) == 2 end)
 
-    sum_pair(result)
+    if length(result) == 2 do sum_pair(result) else 0 end
   end
 
-  # def score(:three_kind, dice) do
+  def score(:three_kind, dice) do
+    result = dice
+    |> Enum.group_by(&(&1))
+    |> Enum.filter(fn {_, list} -> length(list) == 3 end)
 
-  # end
+    if length(result) == 1 do sum_pair(result) else 0 end
+  end
 
-  # def score(:four_kind, dice) do
+  def score(:four_kind, dice) do
+    result = dice
+      |> Enum.group_by(&(&1))
+      |> Enum.filter(fn {_, list} -> length(list) == 4 end)
 
-  # end
+      if length(result) == 1 do sum_pair(result) else 0 end
+  end
 
   def score(:small_straight, [1, 2, 3, 4, 5]) do
     15
@@ -104,9 +115,19 @@ defmodule Yahtzee do
     0
   end
 
-  # def score(:full_house, dice) do
-  # end
+  def score(:full_house, dice) do
+    pair = dice
+      |> Enum.group_by(&(&1))
+      |> Enum.filter(fn {_, list} -> length(list) == 2 end)
 
+    three_pair = dice
+      |> Enum.group_by(&(&1))
+      |> Enum.filter(fn {_, list} -> length(list) == 3 end)
+
+    if length(pair) == 1 and length(three_pair) == 1 do sum_pair(pair) + sum_pair(three_pair) else 0 end
+  end
+
+  # Internal Methods
   def sum_pair([{_x, list} | tail]) do
     Enum.sum(list) + sum_pair(tail)
   end
@@ -115,15 +136,4 @@ defmodule Yahtzee do
     Enum.sum(list)
   end
 
-  # def score(:yahtzee, dice) do
-  #   len = dice
-  #   |> Enum.uniq()
-  #   |> length()
-
-  #   if len == 1 do 50 else 0 end
-  # end
-
-  # def score(:yahtzee, dice) do
-  #   when List.len(Enum.unique(dice)) >= 1 do 0 end
-  # end
 end
