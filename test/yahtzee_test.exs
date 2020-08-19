@@ -4,11 +4,11 @@ defmodule YahtzeeTest do
   doctest Yahtzee
 
   describe "chance" do
-   	test "not" do
+    test "not match" do
       assert Yahtzee.score(:chance, []) == 0
     end
 
-    test "is" do
+    test "match" do
       assert Yahtzee.score(:chance, [1, 2, 3, 4, 5]) == 15
     end
   end
@@ -18,27 +18,27 @@ defmodule YahtzeeTest do
       assert Yahtzee.score(:yahtzee, [1, 5, 3, 2, 1]) == 0
     end
 
-    test "all 6s" do
+    test "all 6s match" do
       assert Yahtzee.score(:yahtzee, [6, 6, 6, 6, 6]) == 50
     end
 
-    test "all 5s" do
+    test "all 5s match" do
       assert Yahtzee.score(:yahtzee, [5, 5, 5, 5, 5]) == 50
     end
 
-    test "all 4s" do
+    test "all 4s match" do
       assert Yahtzee.score(:yahtzee, [4, 4, 4, 4, 4]) == 50
     end
 
-    test "all 3s" do
+    test "all 3s match" do
       assert Yahtzee.score(:yahtzee, [3, 3, 3, 3, 3]) == 50
     end
 
-    test "all 2s" do
+    test "all 2s match" do
       assert Yahtzee.score(:yahtzee, [2, 2, 2, 2, 2]) == 50
     end
 
-    test "all 1s" do
+    test "all 1s match" do
       assert Yahtzee.score(:yahtzee, [1, 1, 1, 1, 1]) == 50
     end
   end
