@@ -32,71 +32,51 @@ defmodule Yahtzee do
   end
 
   def score(:sixes, dice) do
-    dice
-    |> Enum.reject(fn x -> x !== 6 end)
-    |> Enum.sum()
+    sum_value_occurrencies(6, dice)
   end
 
   def score(:fives, dice) do
-    dice
-    |> Enum.reject(fn x -> x !== 5 end)
-    |> Enum.sum()
+    sum_value_occurrencies(5, dice)
   end
 
   def score(:fours, dice) do
-    dice
-    |> Enum.reject(fn x -> x !== 4 end)
-    |> Enum.sum()
+    sum_value_occurrencies(4, dice)
   end
 
   def score(:threes, dice) do
-    dice
-    |> Enum.reject(fn x -> x !== 3 end)
-    |> Enum.sum()
+    sum_value_occurrencies(3, dice)
   end
 
   def score(:twos, dice) do
-    dice
-    |> Enum.reject(fn x -> x !== 2 end)
-    |> Enum.sum()
+    sum_value_occurrencies(2, dice)
   end
 
   def score(:ones, dice) do
-    dice
-    |> Enum.reject(fn x -> x !== 1 end)
-    |> Enum.sum()
+    sum_value_occurrencies(1, dice)
   end
 
   def score(:pair, dice) do
-    result = dice
-    |> Enum.group_by(&(&1))
-    |> Enum.filter(fn {_, list} -> length(list) == 2 end)
+    result = group_values(2, dice)
 
-    if length(result) == 1 do sum_pair(result) else 0 end
+    if length(result) == 1 do sum_group_pairs(result) else 0 end
   end
 
   def score(:two_pair, dice) do
-    result = dice
-    |> Enum.group_by(&(&1))
-    |> Enum.filter(fn {_, list} -> length(list) == 2 end)
+    result = group_values(2, dice)
 
-    if length(result) == 2 do sum_pair(result) else 0 end
+    if length(result) == 2 do sum_group_pairs(result) else 0 end
   end
 
   def score(:three_kind, dice) do
-    result = dice
-    |> Enum.group_by(&(&1))
-    |> Enum.filter(fn {_, list} -> length(list) == 3 end)
+    result = group_values(3, dice)
 
-    if length(result) == 1 do sum_pair(result) else 0 end
+    if length(result) == 1 do sum_group_pairs(result) else 0 end
   end
 
   def score(:four_kind, dice) do
-    result = dice
-      |> Enum.group_by(&(&1))
-      |> Enum.filter(fn {_, list} -> length(list) == 4 end)
+    result = group_values(4, dice)
 
-      if length(result) == 1 do sum_pair(result) else 0 end
+    if length(result) == 1 do sum_group_pairs(result) else 0 end
   end
 
   def score(:small_straight, [1, 2, 3, 4, 5]) do
@@ -116,23 +96,30 @@ defmodule Yahtzee do
   end
 
   def score(:full_house, dice) do
-    pair = dice
-      |> Enum.group_by(&(&1))
-      |> Enum.filter(fn {_, list} -> length(list) == 2 end)
+    pair = group_values(2, dice)
+    three_pair = group_values(3, dice)
 
-    three_pair = dice
-      |> Enum.group_by(&(&1))
-      |> Enum.filter(fn {_, list} -> length(list) == 3 end)
-
-    if length(pair) == 1 and length(three_pair) == 1 do sum_pair(pair) + sum_pair(three_pair) else 0 end
+    if length(pair) == 1 and length(three_pair) == 1 do sum_group_pairs(pair) + sum_group_pairs(three_pair) else 0 end
   end
 
   # Internal Methods
-  def sum_pair([{_x, list} | tail]) do
-    Enum.sum(list) + sum_pair(tail)
+  def sum_value_occurrencies(value, dice) do
+    dice
+    |> Enum.reject(fn x -> x !== value end)
+    |> Enum.sum()
   end
 
-  def sum_pair(list) do
+  def group_values(lenght_list, dice) do
+    dice
+    |> Enum.group_by(&(&1))
+    |> Enum.filter(fn {_, list} -> length(list) == lenght_list end)
+  end
+
+  def sum_group_pairs([{_x, list} | tail]) do
+    Enum.sum(list) + sum_group_pairs(tail)
+  end
+
+  def sum_group_pairs(list) do
     Enum.sum(list)
   end
 
